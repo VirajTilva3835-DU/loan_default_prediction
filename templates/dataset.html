@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Dataset | Machine Learning System{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: 3.5rem;">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+      <h1 class="page-title">Dataset Explorer</h1>
+      <p class="page-subtitle">
+        Inspect the entire original loan application dataset used to train and validate all classification pipelines.
+      </p>
+    </div>
+    <div>
+      <a href="{{ url_for('download_dataset') }}" class="btn btn-primary" id="btn-download-dataset">
+        📥 Download Original CSV
+      </a>
+    </div>
+  </div>
+
+  <!-- Dataset Stats Summary Grid -->
+  <div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+      <div class="stat-icon">📄</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ "{:,}".format(total_rows) }}</div>
+        <div class="stat-label">Total Records (Rows)</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon purple">📊</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ total_cols }} Columns</div>
+        <div class="stat-label">16 Features + LoanID + Default</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon amber">⚠️</div>
+      <div class="stat-info">
+        <div class="stat-value">11.61%</div>
+        <div class="stat-label">Historical Default Rate</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon green">💾</div>
+      <div class="stat-info">
+        <div class="stat-value">25.08 MB</div>
+        <div class="stat-label">Unmodified Original CSV</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls Bar -->
+  <div class="card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <!-- Search Input -->
+      <div style="flex: 1; min-width: 260px;">
+        <input type="text" id="dataset-search" class="form-control" placeholder="🔍 Search by Loan ID, Education, Employment, or Purpose...">
+      </div>
+
+      <!-- Filter by Default -->
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="dataset-filter-default" style="font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap;">Filter Status:</label>
+        <select id="dataset-filter-default" class="form-control" style="width: 170px;">
+          <option value="all">All Records</option>
+          <option value="1">Defaulted (Default=1)</option>
+          <option value="0">Non-Default (Default=0)</option>
+        </select>
+      </div>
+
+      <!-- Rows per Page -->
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="dataset-per-page" style="font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap;">Rows per page:</label>
+        <select id="dataset-per-page" class="form-control" style="width: 100px;">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset Table Container -->
+  <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+    <table class="table" id="dataset-table">
+      <thead style="position: sticky; top: 0; z-index: 10;">
+        <tr>
+          <th>Loan ID</th>
+          <th>Age</th>
+          <th>Income</th>
+          <th>Loan Amount</th>
+          <th>Credit Score</th>
+          <th>Employed</th>
+          <th>Credit Lines</th>
+          <th>Interest</th>
+          <th>Term</th>
+          <th>DTI Ratio</th>
+          <th>Education</th>
+          <th>Employment</th>
+          <th>Marital</th>
+          <th>Mortgage</th>
+          <th>Dependents</th>
+          <th>Purpose</th>
+          <th>CoSigner</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody id="dataset-tbody">
+        <!-- Rendered via JavaScript and API -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Bar -->
+  <div class="pagination-wrapper">
+    <div style="font-size: 0.88rem; color: var(--text-secondary);" id="dataset-rows-info">
+      Showing rows 1–50 of {{ "{:,}".format(total_rows) }}
+    </div>
+
+    <div class="pagination-controls" id="dataset-pagination-controls">
+      <!-- Page buttons injected by script.js -->
+    </div>
+  </div>
+</div>
+{% endblock %}

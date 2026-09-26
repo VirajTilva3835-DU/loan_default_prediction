@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Loan Default Prediction | Machine Learning Platform{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <div class="hero-pill">
+      <span>🚀</span> Live Machine Learning Pipelines Active
+    </div>
+
+    <h1 class="hero-title">
+      Loan Default <span>Prediction</span>
+    </h1>
+
+    <p class="hero-desc">
+      Leverage state-of-the-art Machine Learning models to analyze credit risk, evaluate borrower characteristics, and estimate loan default probabilities in real time.
+    </p>
+
+    <div class="hero-actions">
+      <a href="{{ url_for('predict_page') }}" class="btn btn-primary btn-lg" id="hero-btn-predict">
+        ⚡ Start Prediction
+      </a>
+      <a href="{{ url_for('comparison_page') }}" class="btn btn-secondary btn-lg" id="hero-btn-compare">
+        📊 Compare Models
+      </a>
+      <a href="{{ url_for('dataset_page') }}" class="btn btn-outline btn-lg" id="hero-btn-dataset">
+        📁 Explore Dataset
+      </a>
+    </div>
+
+    <!-- Summary Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card" id="card-stat-models">
+        <div class="stat-icon purple">🧠</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ available_models_count }} / 5</div>
+          <div class="stat-label">Trained ML Models Available</div>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-stat-rows">
+        <div class="stat-icon">📄</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ "{:,}".format(total_rows) }}</div>
+          <div class="stat-label">Total Training Records</div>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-stat-features">
+        <div class="stat-icon green">📐</div>
+        <div class="stat-info">
+          <div class="stat-value">16 Features</div>
+          <div class="stat-label">Applicant & Financial Factors</div>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-stat-default-model">
+        <div class="stat-icon amber">🎯</div>
+        <div class="stat-info">
+          <div class="stat-value" id="home-default-model-name" style="font-size: 1.25rem;">{{ default_model }}</div>
+          <div class="stat-label">Current Default Model</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Purpose & Workflow Banner -->
+    <div class="card" style="text-align: left; margin-top: 2rem; background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+        <div style="max-width: 680px;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 0.6rem;">Enterprise-Grade Binary Classification Pipeline</h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem;">
+            "Compare multiple machine learning models, select your preferred model, and generate predictions using trained ML models."
+          </p>
+          <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.6;">
+            Each model was trained on an 80/20 stratified split of 255,347 loan applications with comprehensive scikit-learn preprocessing pipelines including <code>StandardScaler</code> for continuous variables and <code>OneHotEncoder</code> with dummy variable dropping for categorical features.
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('comparison_page') }}" class="btn btn-outline" style="white-space: nowrap;">
+            Configure Default Model →
+          </a>
+        </div>
+      </div>
+
+      <!-- 3-Step Workflow -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-blue); line-height: 1;">01</div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.2rem;">Input Parameters</div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary);">Enter borrower credit score, DTI ratio, income, employment, and loan terms.</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-indigo); line-height: 1;">02</div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.2rem;">Choose ML Model</div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary);">Use your configured default model or toggle between 5 trained algorithms.</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--status-success); line-height: 1;">03</div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.2rem;">Instant Inference</div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary);">Receive binary default prediction, probability confidence gauge, and risk categorization.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

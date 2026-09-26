@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Model Comparison & Selection | Machine Learning System{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js for data visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: 3.5rem;">
+  <div class="page-header">
+    <h1 class="page-title">Model Comparison & Benchmark</h1>
+    <p class="page-subtitle">
+      Comprehensive performance evaluation across all 5 trained classification pipelines evaluated on the 51,070 hold-out test samples and 5-fold cross-validation.
+    </p>
+  </div>
+
+  <!-- Performance Comparison Table -->
+  <div class="card" style="margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 class="card-title">📊 Evaluated Model Performance Metrics</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">
+          Exact evaluation scores computed from the 80/20 stratified split test set and 5-fold CV.
+        </p>
+      </div>
+      <div>
+        <span class="badge badge-primary">Dataset Split: 80% Train / 20% Test</span>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table" id="comparison-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Accuracy</th>
+            <th>Precision</th>
+            <th>Recall</th>
+            <th>F1 Score</th>
+            <th>CV Mean F1</th>
+            <th>CV Std F1</th>
+            <th>Status</th>
+            <th>Default Model</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, metric in metrics.items() %}
+          <tr data-model="{{ name }}">
+            <td>
+              <strong style="color: var(--text-primary); font-size: 0.95rem;">{{ name }}</strong>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">{{ metric.filename }}</div>
+            </td>
+            <td><strong>{{ "%.2f"|format(metric.accuracy * 100) }}%</strong></td>
+            <td>{{ "%.2f"|format(metric.precision * 100) }}%</td>
+            <td>{{ "%.2f"|format(metric.recall * 100) }}%</td>
+            <td>
+              <span class="badge badge-primary" style="font-size: 0.82rem;">
+                {{ "%.4f"|format(metric.f1_score) }}
+              </span>
+            </td>
+            <td>{{ "%.4f"|format(metric.cv_mean_f1) }}</td>
+            <td>±{{ "%.4f"|format(metric.cv_std_f1) }}</td>
+            <td>
+              {% if metric.status == 'Available' %}
+                <span class="badge badge-success">● Loaded</span>
+              {% else %}
+                <span class="badge badge-danger">○ Unavailable</span>
+              {% endif %}
+            </td>
+            <td>
+              <button type="button" class="btn btn-outline btn-sm btn-make-default" data-model="{{ name }}">
+                Set as Default
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts Comparison Section -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+    <!-- Chart 1: Core Metrics Bar Chart -->
+    <div class="card">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">
+        📈 Accuracy, Precision & Recall Comparison
+      </h3>
+      <div style="position: relative; height: 320px; width: 100%;">
+        <canvas id="metricsComparisonChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: F1 Score & 5-Fold CV Comparison -->
+    <div class="card">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">
+        🎯 F1-Score & 5-Fold Cross Validation (F1)
+      </h3>
+      <div style="position: relative; height: 320px; width: 100%;">
+        <canvas id="f1ComparisonChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Default Model Selection Section -->
+  <div class="card" style="margin-bottom: 2.5rem; background: linear-gradient(180deg, rgba(16, 185, 129, 0.04) 0%, rgba(19, 27, 46, 0.8) 100%); border-color: rgba(16, 185, 129, 0.25);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 class="card-title" style="color: #34d399;">⚙️ Default Prediction Model Selection</h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+          Select which model automatically loads whenever someone opens the prediction page. Persisted in browser storage across sessions.
+        </p>
+      </div>
+      <div>
+        <span class="badge badge-success" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+          Active Default: <strong id="current-default-label" style="margin-left: 4px;">{{ default_model }}</strong>
+        </span>
+      </div>
+    </div>
+
+    <!-- Radio Model Selection -->
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin: 1.25rem 0;">
+      {% for name, metric in metrics.items() %}
+      <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.2rem; background: rgba(11, 19, 41, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);">
+        <input type="radio" name="default_model_choice" value="{{ name }}" {% if name == default_model %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--status-success);">
+        <div style="flex: 1;">
+          <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">{{ name }}</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted);">
+            Test Accuracy: {{ "%.2f"|format(metric.accuracy * 100) }}% • F1 Score: {{ "%.4f"|format(metric.f1_score) }} • File: {{ metric.filename }}
+          </div>
+        </div>
+      </label>
+      {% endfor %}
+    </div>
+
+    <div style="display: flex; justify-content: flex-end;">
+      <button type="button" class="btn btn-primary" id="btn-set-default-model">
+        💾 Save as Default Model
+      </button>
+    </div>
+  </div>
+
+  <!-- Model Architecture & Educational Insights Cards -->
+  <div class="page-header" style="padding-top: 1rem;">
+    <h2 class="page-title" style="font-size: 1.7rem;">Model Technical Architecture & Insights</h2>
+    <p class="page-subtitle">
+      Detailed technical overview of the machine learning algorithms, split logic, and their practical application to loan default prediction.
+    </p>
+  </div>
+
+  <div class="model-cards-grid">
+    <!-- Card 1: Logistic Regression -->
+    <div class="model-card-item" data-model-name="Logistic Regression">
+      <div class="model-card-header">
+        <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Linear Classifier</span>
+        <h3 class="model-card-name">Logistic Regression</h3>
+      </div>
+      <p class="model-card-desc">
+        <strong>What it is:</strong> A foundational statistical algorithm that models the probability of a discrete outcome using a sigmoid link function.<br><br>
+        <strong>Why used for Default Prediction:</strong> Provides a highly interpretable linear baseline. Its calibrated odds ratios allow financial institutions to evaluate how unit changes in interest rate or income linearly influence default probability.
+      </p>
+      <div class="model-meta-list">
+        <div><strong>Model File:</strong> <code>logistic_regression_model.pkl</code></div>
+        <div><strong>Pipeline:</strong> StandardScaler + OneHotEncoder(drop='first')</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">Loaded</span></div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm btn-make-default" data-model="Logistic Regression">
+        Set as Default
+      </button>
+    </div>
+
+    <!-- Card 2: Decision Tree -->
+    <div class="model-card-item" data-model-name="Decision Tree">
+      <div class="model-card-header">
+        <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Non-Linear Partitioning</span>
+        <h3 class="model-card-name">Decision Tree</h3>
+      </div>
+      <p class="model-card-desc">
+        <strong>What it is:</strong> A non-parametric supervised learning algorithm that partitions the feature space into orthogonal hyperplanes based on Gini impurity or entropy gain.<br><br>
+        <strong>Why used for Default Prediction:</strong> Captures non-linear thresholds (e.g., high loan amounts combined with low income) without requiring linear feature independence. Constrained to <code>max_depth=10</code> to curb overfitting.
+      </p>
+      <div class="model-meta-list">
+        <div><strong>Model File:</strong> <code>decision_tree_model.pkl</code></div>
+        <div><strong>Pipeline:</strong> max_depth=10, random_state=42</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">Loaded</span></div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm btn-make-default" data-model="Decision Tree">
+        Set as Default
+      </button>
+    </div>
+
+    <!-- Card 3: Random Forest -->
+    <div class="model-card-item" data-model-name="Random Forest">
+      <div class="model-card-header">
+        <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Bagging Ensemble</span>
+        <h3 class="model-card-name">Random Forest</h3>
+      </div>
+      <p class="model-card-desc">
+        <strong>What it is:</strong> An ensemble meta-estimator that trains 100 decorrelated decision trees on bootstrap samples with random feature sub-sampling, aggregating results via majority voting.<br><br>
+        <strong>Why used for Default Prediction:</strong> Dramatically reduces variance and provides high precision (83.8%), making it ideal for mitigating false-positive loan rejection risks.
+      </p>
+      <div class="model-meta-list">
+        <div><strong>Model File:</strong> <code>random_forest_model.pkl</code></div>
+        <div><strong>Pipeline:</strong> 100 Estimators, max_depth=10, n_jobs=-1</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">Loaded</span></div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm btn-make-default" data-model="Random Forest">
+        Set as Default
+      </button>
+    </div>
+
+    <!-- Card 4: AdaBoost -->
+    <div class="model-card-item" data-model-name="AdaBoost">
+      <div class="model-card-header">
+        <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Adaptive Boosting</span>
+        <h3 class="model-card-name">AdaBoost</h3>
+      </div>
+      <p class="model-card-desc">
+        <strong>What it is:</strong> An adaptive boosting ensemble that constructs a strong classifier by sequentially training 100 decision stumps, increasing weights on borrowers incorrectly classified in preceding iterations.<br><br>
+        <strong>Why used for Default Prediction:</strong> Efficiently surfaces difficult borderline loan applicants who carry subtle credit warning signals that single trees overlook.
+      </p>
+      <div class="model-meta-list">
+        <div><strong>Model File:</strong> <code>adaboost_model.pkl</code></div>
+        <div><strong>Pipeline:</strong> 100 Estimators, learning_rate=0.5</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">Loaded</span></div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm btn-make-default" data-model="AdaBoost">
+        Set as Default
+      </button>
+    </div>
+
+    <!-- Card 5: Gradient Boosting -->
+    <div class="model-card-item" data-model-name="Gradient Boosting">
+      <div class="model-card-header">
+        <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Gradient Boosting</span>
+        <h3 class="model-card-name">Gradient Boosting</h3>
+      </div>
+      <p class="model-card-desc">
+        <strong>What it is:</strong> A sequential ensemble that fits shallow regression trees directly to the negative gradient of the log-loss objective function, minimizing empirical risk.<br><br>
+        <strong>Why used for Default Prediction:</strong> Consistently delivers the highest overall test accuracy (88.64%) and balanced F1-score across non-linear loan interactions.
+      </p>
+      <div class="model-meta-list">
+        <div><strong>Model File:</strong> <code>gradient_boosting_model.pkl</code></div>
+        <div><strong>Pipeline:</strong> 100 Estimators, learning_rate=0.1, max_depth=3</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">Loaded</span></div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm btn-make-default" data-model="Gradient Boosting">
+        Set as Default
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const metricsData = {{ metrics|tojson }};
+  renderComparisonCharts(metricsData);
+});
+
+function renderComparisonCharts(data) {
+  const labels = Object.keys(data);
+  const accuracyVals = labels.map(k => (data[k].accuracy * 100).toFixed(2));
+  const precisionVals = labels.map(k => (data[k].precision * 100).toFixed(2));
+  const recallVals = labels.map(k => (data[k].recall * 100).toFixed(2));
+  const f1Vals = labels.map(k => (data[k].f1_score).toFixed(4));
+  const cvMeanF1Vals = labels.map(k => (data[k].cv_mean_f1).toFixed(4));
+
+  // Chart 1: Accuracy, Precision, Recall
+  const ctx1 = document.getElementById('metricsComparisonChart');
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Accuracy (%)',
+            data: accuracyVals,
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderColor: '#3b82f6',
+            borderWidth: 1
+          },
+          {
+            label: 'Precision (%)',
+            data: precisionVals,
+            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            borderColor: '#10b981',
+            borderWidth: 1
+          },
+          {
+            label: 'Recall (%)',
+            data: recallVals,
+            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+            borderColor: '#f59e0b',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#94a3b8' } }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { color: '#94a3b8' },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+          },
+          x: {
+            ticks: { color: '#94a3b8' },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+          }
+        }
+      }
+    });
+  }
+
+  // Chart 2: F1 & 5-Fold CV Mean
+  const ctx2 = document.getElementById('f1ComparisonChart');
+  if (ctx2) {
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Hold-out Test F1 Score',
+            data: f1Vals,
+            backgroundColor: 'rgba(139, 92, 246, 0.8)',
+            borderColor: '#8b5cf6',
+            borderWidth: 1
+          },
+          {
+            label: '5-Fold CV Mean F1',
+            data: cvMeanF1Vals,
+            backgroundColor: 'rgba(6, 182, 212, 0.8)',
+            borderColor: '#06b6d4',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#94a3b8' } }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#94a3b8' },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+          },
+          x: {
+            ticks: { color: '#94a3b8' },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+          }
+        }
+      }
+    });
+  }
+}
+</script>
+{% endblock %}

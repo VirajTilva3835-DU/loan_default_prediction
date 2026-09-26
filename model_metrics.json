@@ -1,0 +1,62 @@
+{
+    "Logistic Regression": {
+        "model_name": "Logistic Regression",
+        "filename": "logistic_regression_model.pkl",
+        "accuracy": 0.885177,
+        "precision": 0.603077,
+        "recall": 0.033047,
+        "f1_score": 0.06266,
+        "cv_mean_f1": 0.064208,
+        "cv_std_f1": 0.002691,
+        "status": "Available",
+        "train_time_sec": 1.12
+    },
+    "Decision Tree": {
+        "model_name": "Decision Tree",
+        "filename": "decision_tree_model.pkl",
+        "accuracy": 0.88177,
+        "precision": 0.432873,
+        "recall": 0.058169,
+        "f1_score": 0.102556,
+        "cv_mean_f1": 0.111687,
+        "cv_std_f1": 0.009876,
+        "status": "Available",
+        "train_time_sec": 3.14
+    },
+    "Random Forest": {
+        "model_name": "Random Forest",
+        "filename": "random_forest_model.pkl",
+        "accuracy": 0.884355,
+        "precision": 0.837838,
+        "recall": 0.005227,
+        "f1_score": 0.010389,
+        "cv_mean_f1": 0.010883,
+        "cv_std_f1": 0.002485,
+        "status": "Available",
+        "train_time_sec": 5.57
+    },
+    "AdaBoost": {
+        "model_name": "AdaBoost",
+        "filename": "adaboost_model.pkl",
+        "accuracy": 0.885353,
+        "precision": 0.647287,
+        "recall": 0.028157,
+        "f1_score": 0.053967,
+        "cv_mean_f1": 0.054265,
+        "cv_std_f1": 0.002468,
+        "status": "Available",
+        "train_time_sec": 31.22
+    },
+    "Gradient Boosting": {
+        "model_name": "Gradient Boosting",
+        "filename": "gradient_boosting_model.pkl",
+        "accuracy": 0.886411,
+        "precision": 0.636555,
+        "recall": 0.051088,
+        "f1_score": 0.094584,
+        "cv_mean_f1": 0.091856,
+        "cv_std_f1": 0.002727,
+        "status": "Available",
+        "train_time_sec": 80.06
+    }
+}
