@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Loan Default Prediction | Machine Learning System{% endblock %}</title>
+  <title>{% block title %}CrediPulse AI | Intelligent Loan Default Prediction Platform{% endblock %}</title>
   <meta name="description" content="ML-powered Loan Default Prediction system comparing Logistic Regression, Decision Tree, Random Forest, AdaBoost, and Gradient Boosting.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,10 +16,10 @@
   <!-- Navigation Bar -->
   <nav class="navbar" id="main-nav">
     <div class="container nav-container">
-      <a href="{{ url_for('home') }}" class="brand" id="brand-link">
-        <div class="brand-icon">⚡</div>
-        <div>
-          LoanML <span class="brand-badge">Predictor</span>
+      <a href="{{ url_for('home') }}" class="brand interactive-brand" id="brand-link" style="transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); box-shadow: 0 0 15px rgba(59,130,246,0.6);">⚡</div>
+        <div style="font-weight: 800; letter-spacing: -0.02em;">
+          CrediPulse <span class="brand-badge" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-weight: 700; border: none; box-shadow: 0 0 10px rgba(59,130,246,0.5); text-transform: uppercase;">AI</span>
         </div>
       </a>
 
@@ -97,7 +97,7 @@
       <div class="footer-inner">
         <div>
           <div style="font-weight: 700; color: var(--text-primary); font-size: 1rem; margin-bottom: 0.25rem;">
-            Loan Default ML Prediction System
+            CrediPulse AI - Intelligent Loan Default Prediction System
           </div>
           <p class="disclaimer-text">
             Academic Project • Week 4 Machine Learning Implementation. Benchmarking Logistic Regression, Decision Tree, Random Forest, AdaBoost, and Gradient Boosting pipelines on 255,000+ loan records.

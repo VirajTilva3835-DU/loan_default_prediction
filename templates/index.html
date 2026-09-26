@@ -1,17 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Loan Default Prediction | Machine Learning Platform{% endblock %}
+{% block title %}CrediPulse AI | Intelligent Loan Default Prediction Platform{% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="container">
-    <div class="hero-pill">
-      <span>🚀</span> Live Machine Learning Pipelines Active
+    <div class="hero-pill" style="cursor: pointer; user-select: none; transition: all 0.3s ease;" title="Click to view live status" onclick="const s = this.querySelector('.pill-status-text'); s.textContent = s.textContent.includes('Active') ? '⚡ 5 ML Models Loaded • 255k Records' : 'Live Machine Learning Pipelines Active';">
+      <span>🚀</span> <span class="pill-status-text">Live Machine Learning Pipelines Active</span>
     </div>
 
-    <h1 class="hero-title">
-      Loan Default <span>Prediction</span>
+    <h1 class="hero-title" style="cursor: pointer; transition: transform 0.25s ease, filter 0.25s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.filter='drop-shadow(0 0 25px rgba(96,165,250,0.5))'" onmouseout="this.style.transform='scale(1)'; this.style.filter='none'">
+      CrediPulse <span>AI</span>
     </h1>
+    <div style="display: inline-block; margin-top: -0.5rem; margin-bottom: 1.25rem;">
+      <span style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 0.35rem 0.9rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">
+        ⚡ Intelligent Loan Default Risk Engine
+      </span>
+    </div>
 
     <p class="hero-desc">
       Leverage state-of-the-art Machine Learning models to analyze credit risk, evaluate borrower characteristics, and estimate loan default probabilities in real time.
